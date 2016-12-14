@@ -17,8 +17,7 @@ import java.util.List;
 public class ServerTestoMultiThreaded {
     
     public static List<User> Utenti = new ArrayList();
-    
-    public static List<Thread> workers = new ArrayList();
+    public static String Broadcast=null;
     
 
     public static void main(String[] args) {
@@ -42,9 +41,8 @@ public class ServerTestoMultiThreaded {
                 try {
                     //server.accept returns a client connection
                     w = new SocketWorker(server.accept());
-                    Thread t = new Thread(w);
-                    workers.add(t);
-                    workers.get(workers.size()-1).start();
+                    Thread t = new Thread(w);                    
+                    t.start();
                 } catch (IOException e) {
                     System.out.println("Connessione NON riuscita con client: ");
                     System.exit(-1);
@@ -58,11 +56,6 @@ public class ServerTestoMultiThreaded {
         
     }
     
-    public static void receiveResendMessage(Thread t, String s){
-     for(int j=0;j<workers.size();j++){
-        if(!workers.get(j).equals(t)) workers.get(j).BroadcastMessage(s);
-     }
-    }
 
     
 }

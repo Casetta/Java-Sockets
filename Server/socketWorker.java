@@ -28,6 +28,7 @@ class SocketWorker implements Runnable {
         BufferedReader in = null;
         PrintWriter out = null;
         boolean firstTime =true;
+        
         try{
           // connessione con il socket per ricevere (in) e mandare(out) il testo
           in = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -72,7 +73,13 @@ class SocketWorker implements Runnable {
                
             }
             firstTime=false;
+            BroadcastListener w= new BroadcastListener(out);
+            Thread t = new Thread(w);
+            t.start();
             }
+            
+            
+            
             line = in.readLine();
 
 		if(line.equals("!Users")){
@@ -85,6 +92,8 @@ class SocketWorker implements Runnable {
             out.println("Server---> " + nameClient + ">> " + line);
             //scrivi messaggio ricevuto su terminale
             System.out.println(nameClient + ": " + line);
+            
+            ServerTestoMultiThreaded.Broadcast=nameClient + ": " + line;
            } catch (IOException e) {
             System.out.println("lettura da socket fallito");
             System.exit(-1);
@@ -99,4 +108,5 @@ class SocketWorker implements Runnable {
         }
 	ServerTestoMultiThreaded.Utenti.get(posClient).setStatus(false);
     }
+    
 }
