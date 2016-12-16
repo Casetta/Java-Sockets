@@ -28,6 +28,8 @@ class SocketWorker implements Runnable {
         BufferedReader in = null;
         PrintWriter out = null;
         boolean firstTime =true;
+        Thread t=null;
+        int posGP=0;
         
         try{
           // connessione con il socket per ricevere (in) e mandare(out) il testo
@@ -73,8 +75,19 @@ class SocketWorker implements Runnable {
                
             }
             firstTime=false;
-            BroadcastListener w= new BroadcastListener(out);
-            Thread t = new Thread(w);
+            
+            if(ServerTestoMultiThreaded.Gruppi.isEmpty()){
+                out.println("Non esistono chat attive");
+            }else{
+                out.println("Group chat attive:");
+                for(int j=0;j<ServerTestoMultiThreaded.Gruppi.size();j++){
+                    if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)){
+                        out.println(ServerTestoMultiThreaded.Gruppi.get(j).getTitle());
+                    }
+                }
+            }
+            BroadcastListener w= new BroadcastListener(out, "", 0);
+            t = new Thread(w);
             t.start();
             }
             
@@ -87,13 +100,31 @@ class SocketWorker implements Runnable {
 			for(int j=0;j<_lenghtList;j++){
 				if(ServerTestoMultiThreaded.Utenti.get(j).getStatus()) out.println(ServerTestoMultiThreaded.Utenti.get(j).getNickname());
 			}
-		}
+		}else if(line.equals("!CreateGP")){
+                    t.interrupt();
+                    out.println("Inserisci il titolo della group chat");
+                    String _title = in.readLine();
+                    out.println("Inserisci la descrizione della group chat");
+                    ServerTestoMultiThreaded.Gruppi.add(new Group(_title, in.readLine(), ServerTestoMultiThreaded.Utenti.get(posClient)));
+                    posGP=ServerTestoMultiThreaded.Gruppi.size();
+                    BroadcastListener w= new BroadcastListener(out, "ok", ServerTestoMultiThreaded.Gruppi.size()-1);
+                    t = new Thread(w);
+                    t.start();
+                }
+                
+                
             //Manda lo stesso messaggio appena ricevuto con in aggiunta il "nome" del client
             out.println("Server---> " + nameClient + ">> " + line);
             //scrivi messaggio ricevuto su terminale
             System.out.println(nameClient + ": " + line);
             
-            ServerTestoMultiThreaded.Broadcast=nameClient + ": " + line;
+            if(posGP==0){
+                 ServerTestoMultiThreaded.Broadcast=nameClient + ": " + line;
+            }else{
+                ServerTestoMultiThreaded.Gruppi.get(posGP-1).setBroadcastMessage(nameClient + ": " + line);
+            }
+            
+           
            } catch (IOException e) {
             System.out.println("lettura da socket fallito");
             System.exit(-1);

@@ -13,18 +13,32 @@ import java.io.PrintWriter;
  */
     class BroadcastListener implements Runnable {
             PrintWriter o;
-            String bMessage= ServerTestoMultiThreaded.Broadcast;
+            String bMessage= null;
+            String ref=null;
+            int posGP;
         
-            BroadcastListener(PrintWriter o){
+            BroadcastListener(PrintWriter o, String ref,int posGP){
                 this.o=o;
+                this.ref=ref;
+                this.posGP=posGP;
+                
             }
         
         public void run(){
-            while(true){
-            if(bMessage!=ServerTestoMultiThreaded.Broadcast){
-                o.println(ServerTestoMultiThreaded.Broadcast);
-                bMessage=ServerTestoMultiThreaded.Broadcast;
-            }
+            if(ref.equals("")){
+                    while(true){
+                        if(bMessage.equals(ServerTestoMultiThreaded.Broadcast)){
+                            o.println(ServerTestoMultiThreaded.Broadcast);
+                            bMessage=ServerTestoMultiThreaded.Broadcast;
+                        }
+                    }
+                }else{
+                    while(true){
+                        if(bMessage.equals(ServerTestoMultiThreaded.Gruppi.get(posGP).getBroadcastMessage())){
+                            o.println(ServerTestoMultiThreaded.Gruppi.get(posGP).getBroadcastMessage());
+                            bMessage=ServerTestoMultiThreaded.Gruppi.get(posGP).getBroadcastMessage();
+                        }
+                    }
+                }
         }
-        }
-}
+    }
