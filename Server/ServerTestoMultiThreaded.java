@@ -17,7 +17,7 @@ import java.util.List;
 public class ServerTestoMultiThreaded {
     
     public static List<User> Utenti = new ArrayList();
-    public static String Broadcast=null;
+    public static String Broadcast = "";
     public static List<Group> Gruppi = new ArrayList();
     
 

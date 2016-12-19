@@ -9,9 +9,9 @@
  * @author Gasperini Luca
  */
 public class User {
-    public String i;	//Indirizzo IP
-    public String n;	//Nickname
-    public boolean s;	//Status utente(online, offline)
+    private String i;	//Indirizzo IP
+    private String n;	//Nickname
+    private boolean s;	//Status utente(online, offline)
     
     public User(String i, String n, boolean s){		//Costruttore completo
         this.i=i;
