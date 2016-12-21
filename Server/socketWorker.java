@@ -29,7 +29,7 @@ class SocketWorker implements Runnable {
         PrintWriter out = null;
         boolean firstTime =true;
         Thread t=null;
-        int posGP=0;
+        int posGP=-1;
         
         try{
           // connessione con il socket per ricevere (in) e mandare(out) il testo
@@ -92,15 +92,20 @@ class SocketWorker implements Runnable {
             t.start();
             }
             
+            
             for(int i=0;i<ServerTestoMultiThreaded.Gruppi.size();i++){
-                if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)&&!ServerTestoMultiThreaded.Gruppi.get(i).getTitle().equals(ServerTestoMultiThreaded.Gruppi.get(posGP).getTitle())){
-                    out.println("Sei stato invitato al gruppo "+ServerTestoMultiThreaded.Gruppi.get(i).getTitle()+", scrivi !joinGP e il nome del gruppo per entrare");
+                if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)){
+                    if(posGP<0){
+                        out.println("Sei stato invitato al gruppo "+ServerTestoMultiThreaded.Gruppi.get(i).getTitle()+", scrivi !joinGP e il nome del gruppo per entrare");
+                    }else if(posGP!=i)
+                        out.println("Sei stato invitato al gruppo "+ServerTestoMultiThreaded.Gruppi.get(i).getTitle()+", scrivi !joinGP e il nome del gruppo per entrare");
                 }
             }
             
             
             line = in.readLine();
-
+            
+            if(line!=null){
 		if(line.equals("!Users")){
                     _lenghtList = ServerTestoMultiThreaded.Utenti.size();
 			for(int j=0;j<_lenghtList;j++){
@@ -117,6 +122,9 @@ class SocketWorker implements Runnable {
                     t = new Thread(w);
                     t.start();
                 }else if(line.equals("!InviteUser")){
+                    if(posGP<0){
+                        out.println("Non sei all'interno di un group chat");
+                    }else{
                     out.println("Inserisci nome utente da invitare");
                     _lenghtList = ServerTestoMultiThreaded.Utenti.size();
 			for(int j=0;j<_lenghtList;j++){
@@ -125,10 +133,11 @@ class SocketWorker implements Runnable {
                                     ServerTestoMultiThreaded.Gruppi.get(posGP).setNewUser(ServerTestoMultiThreaded.Utenti.get(j));
                                 }
                         }
+                    }
                 }else if(line.equals("!JoinGP")){
                     out.println("Scrivi il nome del gruppo");
                     for(int i=0;i<ServerTestoMultiThreaded.Gruppi.size();i++){
-                        if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)&&ServerTestoMultiThreaded.Gruppi.get(i).getTitle().equals(in.readLine())){
+                        if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)&& ServerTestoMultiThreaded.Gruppi.get(i).getTitle().equals(in.readLine())){
                             posGP=i;
                             t.interrupt();
                             BroadcastListener w= new BroadcastListener(out, posGP);
@@ -137,20 +146,36 @@ class SocketWorker implements Runnable {
                             out.println("Connesso alla chat gruppo");
                         }
                     }
-                }else{
+                }else if(line.equals("!ExitGP")){
+                    if(posGP<0){
+                        out.println("Non sei all'interno di una group chat");
+                    }else{
+                        ServerTestoMultiThreaded.Gruppi.get(posGP).removeUser(ServerTestoMultiThreaded.Utenti.get(posClient));
+                        posGP=-1;
+                        t.interrupt();
+                        BroadcastListener w= new BroadcastListener(out, -1);
+                        t = new Thread(w);
+                        t.start();
+                        out.println("Uscito dalla chat gruppo");
+                    
+                    }
+                    
+                }
+                else{
                      //Manda lo stesso messaggio appena ricevuto con in aggiunta il "nome" del client
                     out.println("Server---> " + nameClient + ">> " + line);
                     //scrivi messaggio ricevuto su terminale
                     System.out.println(nameClient + ": " + line);
                 }
+            }
                 
                 
            
             
-            if(posGP==0){
+            if(posGP==-1){
                  ServerTestoMultiThreaded.Broadcast=nameClient + ": " + line;
             }else{
-                ServerTestoMultiThreaded.Gruppi.get(posGP-1).setBroadcastMessage(nameClient + ": " + line);
+                ServerTestoMultiThreaded.Gruppi.get(posGP).setBroadcastMessage(nameClient + ": " + line);
             }
             
            
