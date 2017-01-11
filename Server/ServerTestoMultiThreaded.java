@@ -29,6 +29,7 @@ public class ServerTestoMultiThreaded {
             System.out.println("Uso: java ServerTestoMultithreaded <Porta Server>");
             return;
         }
+        
 
         int portNumber = Integer.parseInt(args[0]);
 
@@ -56,6 +57,14 @@ public class ServerTestoMultiThreaded {
 
         
     }
+    
+    public static void Update(int i){
+        if(i<0){
+            synchronized (Broadcast) {
+                    Broadcast.notifyAll();                    
+                }
+        }
+}
     
 
     

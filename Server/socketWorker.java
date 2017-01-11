@@ -8,6 +8,8 @@ import java.io.*;
 import java.util.ArrayList;
 import static java.util.Collections.list;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -172,8 +174,11 @@ class SocketWorker implements Runnable {
                 
            
             
-            if(posGP==-1){
-                 ServerTestoMultiThreaded.Broadcast=nameClient + ": " + line;
+            if(posGP<0){
+                synchronized (ServerTestoMultiThreaded.Broadcast) { 
+                    ServerTestoMultiThreaded.Broadcast=nameClient + ": " + line;
+                }
+                ServerTestoMultiThreaded.Update(posGP);
             }else{
                 ServerTestoMultiThreaded.Gruppi.get(posGP).setBroadcastMessage(nameClient + ": " + line);
             }

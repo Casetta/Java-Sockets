@@ -1,5 +1,7 @@
 
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -23,12 +25,21 @@ import java.io.PrintWriter;
             }
         
         public void run(){
-            if(posGP<0){
-                    while(true){
-                        if(!ServerTestoMultiThreaded.Broadcast.isEmpty()){
-                            if(!bMessage.equals(ServerTestoMultiThreaded.Broadcast)){
-                                o.println(ServerTestoMultiThreaded.Broadcast);
-                                bMessage=ServerTestoMultiThreaded.Broadcast;
+                if(posGP<0){
+                    synchronized (ServerTestoMultiThreaded.Broadcast) {
+                        while(true){
+                            try {
+                                ServerTestoMultiThreaded.Broadcast.wait();
+                                
+                                System.out.println("si"+ posGP);
+                                if(!ServerTestoMultiThreaded.Broadcast.isEmpty()){
+                                    
+                                    
+                                    bMessage=ServerTestoMultiThreaded.Broadcast;
+                                    o.println(bMessage);
+                                }
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(BroadcastListener.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
                     }
@@ -42,6 +53,7 @@ import java.io.PrintWriter;
                         }
                     }
                 }
-        }
+        
+       }
         
     }
