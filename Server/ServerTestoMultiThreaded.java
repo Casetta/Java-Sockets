@@ -19,7 +19,7 @@ public class ServerTestoMultiThreaded {
     public static List<User> Utenti = new ArrayList();
     public static String Broadcast = "";
     public static List<Group> Gruppi = new ArrayList();
-    
+    public static List<SocketWorker> threads = new ArrayList();
 
     public static void main(String[] args) {
 
@@ -43,7 +43,8 @@ public class ServerTestoMultiThreaded {
                 try {
                     //server.accept returns a client connection
                     w = new SocketWorker(server.accept());
-                    Thread t = new Thread(w);                    
+                    Thread t = new Thread(w);
+                    threads.add(w);
                     t.start();
                 } catch (IOException e) {
                     System.out.println("Connessione NON riuscita con client: ");
@@ -58,11 +59,9 @@ public class ServerTestoMultiThreaded {
         
     }
     
-    public static void Update(int i){
-        if(i<0){
-            synchronized (Broadcast) {
-                    Broadcast.notifyAll();                    
-                }
+    public static void Update(String text, int GP){
+        for (int j=0;j<threads.size();j++) {
+            threads.get(j).sendMessage(text, GP);
         }
 }
     

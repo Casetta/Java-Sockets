@@ -16,8 +16,11 @@ import java.util.logging.Logger;
  * @author Gasperini Luca, Casetta Lorenzo
  */
 class SocketWorker implements Runnable {
-  private Socket client;
-
+  public Socket client;
+    BufferedReader in = null;
+        PrintWriter out = null;
+  private String lastMSG=null;
+  private int posGP;
     //Constructor: inizializza le variabili
     SocketWorker(Socket client) {
         this.client = client;
@@ -27,11 +30,9 @@ class SocketWorker implements Runnable {
     // Questa e' la funzione che viene lanciata quando il nuovo "Thread" viene generato
     public void run(){
         
-        BufferedReader in = null;
-        PrintWriter out = null;
+        
         boolean firstTime =true;
-        Thread t=null;
-        int posGP=-1;
+        posGP=-1;
         
         try{
           // connessione con il socket per ricevere (in) e mandare(out) il testo
@@ -89,9 +90,6 @@ class SocketWorker implements Runnable {
                 }
             }
             out.println("Comandi disponibili: !Users, !CreateGP, !InviteUser, !JoinGP");
-            BroadcastListener w= new BroadcastListener(out, -1);
-            t = new Thread(w);
-            t.start();
             }
             
             
@@ -114,15 +112,11 @@ class SocketWorker implements Runnable {
 				if(ServerTestoMultiThreaded.Utenti.get(j).getStatus()) out.println(ServerTestoMultiThreaded.Utenti.get(j).getNickname());
 			}
 		}else if(line.equals("!CreateGP")){
-                    t.interrupt();
                     out.println("Inserisci il titolo della group chat");
                     String _title = in.readLine();
                     out.println("Inserisci la descrizione della group chat");
                     ServerTestoMultiThreaded.Gruppi.add(new Group(_title, in.readLine(), ServerTestoMultiThreaded.Utenti.get(posClient)));
                     posGP=ServerTestoMultiThreaded.Gruppi.size()-1;
-                    BroadcastListener w= new BroadcastListener(out, posGP);
-                    t = new Thread(w);
-                    t.start();
                 }else if(line.equals("!InviteUser")){
                     if(posGP<0){
                         out.println("Non sei all'interno di un group chat");
@@ -141,10 +135,6 @@ class SocketWorker implements Runnable {
                     for(int i=0;i<ServerTestoMultiThreaded.Gruppi.size();i++){
                         if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)&& ServerTestoMultiThreaded.Gruppi.get(i).getTitle().equals(in.readLine())){
                             posGP=i;
-                            t.interrupt();
-                            BroadcastListener w= new BroadcastListener(out, posGP);
-                            t = new Thread(w);
-                            t.start();
                             out.println("Connesso alla chat gruppo");
                         }
                     }
@@ -154,10 +144,6 @@ class SocketWorker implements Runnable {
                     }else{
                         ServerTestoMultiThreaded.Gruppi.get(posGP).removeUser(ServerTestoMultiThreaded.Utenti.get(posClient));
                         posGP=-1;
-                        t.interrupt();
-                        BroadcastListener w= new BroadcastListener(out, -1);
-                        t = new Thread(w);
-                        t.start();
                         out.println("Uscito dalla chat gruppo");
                     
                     }
@@ -172,16 +158,8 @@ class SocketWorker implements Runnable {
             }
                 
                 
-           
-            
-            if(posGP<0){
-                synchronized (ServerTestoMultiThreaded.Broadcast) { 
-                    ServerTestoMultiThreaded.Broadcast=nameClient + ": " + line;
-                }
-                ServerTestoMultiThreaded.Update(posGP);
-            }else{
-                ServerTestoMultiThreaded.Gruppi.get(posGP).setBroadcastMessage(nameClient + ": " + line);
-            }
+           lastMSG= nameClient + ": " + line;
+            ServerTestoMultiThreaded.Update(nameClient + ": " + line, posGP);
             
            
            } catch (IOException e) {
@@ -197,6 +175,12 @@ class SocketWorker implements Runnable {
             System.out.println("Errore connessione con client: " + client);
         }
 	ServerTestoMultiThreaded.Utenti.get(posClient).setStatus(false);
+    }
+    
+    public void sendMessage(String text, int GP){
+        if(!text.equals(lastMSG) && GP==posGP){
+            out.println(text);
+        }
     }
     
 }
