@@ -106,18 +106,18 @@ class SocketWorker implements Runnable {
             line = in.readLine();
             
             if(line!=null){
-		if(line.equals("!Users")){
+		if(line.equals("!Users")){                                                     //mostra lista utenti online
                     _lenghtList = ServerTestoMultiThreaded.Utenti.size();
 			for(int j=0;j<_lenghtList;j++){
 				if(ServerTestoMultiThreaded.Utenti.get(j).getStatus()) out.println(ServerTestoMultiThreaded.Utenti.get(j).getNickname());
 			}
-		}else if(line.equals("!CreateGP")){
+		}else if(line.equals("!CreateGP")){                                           //crea group chat
                     out.println("Inserisci il titolo della group chat");
                     String _title = in.readLine();
                     out.println("Inserisci la descrizione della group chat");
                     ServerTestoMultiThreaded.Gruppi.add(new Group(_title, in.readLine(), ServerTestoMultiThreaded.Utenti.get(posClient)));
                     posGP=ServerTestoMultiThreaded.Gruppi.size()-1;
-                }else if(line.equals("!InviteUser")){
+                }else if(line.equals("!InviteUser")){                                       //invita utente
                     if(posGP<0){
                         out.println("Non sei all'interno di un group chat");
                     }else{
@@ -130,15 +130,15 @@ class SocketWorker implements Runnable {
                                 }
                         }
                     }
-                }else if(line.equals("!JoinGP")){
+                }else if(line.equals("!JoinGP")){                           //entra in una group chat
                     out.println("Scrivi il nome del gruppo");
                     for(int i=0;i<ServerTestoMultiThreaded.Gruppi.size();i++){
                         if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)&& ServerTestoMultiThreaded.Gruppi.get(i).getTitle().equals(in.readLine())){
                             posGP=i;
-                            out.println("Connesso alla chat gruppo");
+                            out.println("sei stato aggiunto al gruppo");
                         }
                     }
-                }else if(line.equals("!ExitGP")){
+                }else if(line.equals("!ExitGP")){                                   //esci dalla chat di gruppo
                     if(posGP<0){
                         out.println("Non sei all'interno di una group chat");
                     }else{
@@ -181,6 +181,5 @@ class SocketWorker implements Runnable {
         if(!text.equals(lastMSG) && GP==posGP){
             out.println(text);
         }
-    }
-    
+    }    
 }

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ServerTestoMultiThreaded {
+public class ServerTestoMultiThreaded {             
     
     public static List<User> Utenti = new ArrayList();
     public static String Broadcast = "";
@@ -59,7 +59,7 @@ public class ServerTestoMultiThreaded {
         
     }
     
-    public static void Update(String text, int GP){
+    public static void Update(String text, int GP){                         //broadcast del messaggio a tutti gli utenti del server
         for (int j=0;j<threads.size();j++) {
             threads.get(j).sendMessage(text, GP);
         }

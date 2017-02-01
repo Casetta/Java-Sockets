@@ -17,16 +17,13 @@ public class Group {
     public String t;	//Titolo
     public String d;	//Descrizione
     public List<User> u;	//Lista utenti nel gruppo
-    public String b;    //Messaggio in broadcast
     
     public Group(String t, String d){		//Costruttore completo
-        this.t=t;
         this.t=t;
         u= new ArrayList();
     }
     
     public Group(String t, String d, User u){
-        this.t=t;
         this.t=t;
         this.u= new ArrayList();
         this.u.add(u);
@@ -53,29 +50,19 @@ public class Group {
 
 	public void setNewUser(User n){
 		u.add(n);
-	}
-  
-  public void removeUser(User o){
+	}  
+  public void removeUser(User o){                   //rimozione utente dalla lista utenti 
     for(int i=0;i<u.size();i++){
       if(u.get(i).equals(o)){
         u.remove(i);
       }
     }
-  }
-  
-  public boolean userExists(String uN){
+  }  
+  public boolean userExists(String uN){             //verifica presenza utente all interno del gruppo
       for(int i=0;i<u.size();i++){
           if(uN.equals(u.get(i).getNickname())) return true;
       }
       return false;
-  }
-  
-  public void setBroadcastMessage(String b){
-      this.b=b;
-  }
-  
-  public String getBroadcastMessage(){
-      return b;
   }
  
 }
