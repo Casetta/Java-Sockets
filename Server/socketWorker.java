@@ -89,7 +89,7 @@ class SocketWorker implements Runnable {
                     }
                 }
             }
-            out.println("Comandi disponibili: !Users, !CreateGP, !InviteUser, !JoinGP");
+            out.println("Comandi disponibili: !Users, !CreateGP, !InviteUser, !JoinGP, !ExitGP, !Help");
             }
             
             
@@ -101,17 +101,26 @@ class SocketWorker implements Runnable {
                         out.println("Sei stato invitato al gruppo "+ServerTestoMultiThreaded.Gruppi.get(i).getTitle()+", scrivi !joinGP e il nome del gruppo per entrare");
                 }
             }
+		  if(posGP<0){
+			  out.print(">");
+		  }
+		  else{
+			  out.print(ServerTestoMultiThreaded.Gruppi.get(posGP).getTitle()+">")
+		  }
+		  
             
             
             line = in.readLine();
             
             if(line!=null){
 		if(line.equals("!Users")){                                                     //mostra lista utenti online
+			System.out.println(nameClient+" ha richiesto il comando !Users");
                     _lenghtList = ServerTestoMultiThreaded.Utenti.size();
 			for(int j=0;j<_lenghtList;j++){
 				if(ServerTestoMultiThreaded.Utenti.get(j).getStatus()) out.println(ServerTestoMultiThreaded.Utenti.get(j).getNickname());
 			}
 		}else if(line.equals("!CreateGP")){                                           //crea group chat
+			System.out.println(nameClient+" ha richiesto il comando !CreateGP");
                     out.println("Nome del gruppo ");
                     String _title = in.readLine();
                     out.println("Descrizione del gruppo ");
@@ -131,6 +140,7 @@ class SocketWorker implements Runnable {
                         }
                     }
                 }else if(line.equals("!JoinGP")){                           //entra in una group chat
+			System.out.println(nameClient+" ha richiesto il comando !JoinGP");
                     out.println("Scrivi il nome del gruppo");
                     for(int i=0;i<ServerTestoMultiThreaded.Gruppi.size();i++){
                         if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)&& ServerTestoMultiThreaded.Gruppi.get(i).getTitle().equals(in.readLine())){
@@ -139,6 +149,7 @@ class SocketWorker implements Runnable {
                         }
                     }
                 }else if(line.equals("!ExitGP")){                                   //esci dalla chat di gruppo
+			System.out.println(nameClient+" ha richiesto il comando !ExitGP");
                     if(posGP<0){
                         out.println("Non sei all'interno di una group chat");
                     }else{
@@ -148,12 +159,28 @@ class SocketWorker implements Runnable {
                     
                     }
                     
-                }
+                }else if(line.equals("!ListGP")){
+			System.out.println(nameClient+" ha richiesto il comando !ListGP");
+			for(int i=0;i<ServerTestoMultiThreaded.Gruppi.size();i++){
+                        	out.println("Nome: "+ServerTestoMultiThreaded.Gruppi.get(posGP).getTitle());
+				out.println("Descrizione: "+ServerTestoMultiThreaded.Gruppi.get(posGP).getDescription());
+                    }
+		}
+		    else if(line.equals("!Help")){
+			    System.out.println(nameClient+" ha richiesto il comando !Help");
+			out.println("!Users -> comando per visualizzare gli utenti attualmente online sul server");
+			out.println("!CreateGP -> comando per creare una stanza di chat privata");
+			out.println("!InviteUser -> comando per invitare un utente online sul server in una stanza di chat privata");
+			out.println("!JoinGP -> dopo aver ricevuto un invito, si può usare questo comando per accedere alla stanza di chat privata");
+			out.println("!ExitGP -> comando per uscire dalla stanza di chat privata");
+			out.println("!ListGP -> elenca tutte le stanze di chat private esistenti sul server");
+		}
                 else{
                      //Manda lo stesso messaggio appena ricevuto con in aggiunta il "nome" del client
-                    out.println(nameClient + " --> " + line);
+                    out.print("      -Inviato");
+			out.println("");
                     //scrivi messaggio ricevuto su terminale
-                    System.out.println(nameClient + " : " + line);
+                    System.out.println("-Ricevuto messaggio da "nameClient + " : " + line);
                 }
             }
                 
