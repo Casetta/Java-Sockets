@@ -2,10 +2,13 @@
 # Java-Sockets
 Software educativo per la comunicazione server-client, tramite l'utilizzo di sockets 
 ```
-Obitettivo del software: inviare linee di testo da un programma (Client)... -->
+Funzionamento del software: inviare linee di testo da un programma (Client)... -->
                          --> ad un altro (Server) anche eventualmente remoto.
 ```
-**Nota:** Visiona le [Slides sul concetto di comunicazione server-client](https://docs.google.com/presentation/d/19vhath-GbtUO7ofpukJE4Opi16aTfrnurJ2lUizB0iE/edit?usp=sharing)
+**Nota:** 
+Visiona le [Slides sul concetto di comunicazione server-client](https://docs.google.com/presentation/d/19vhath-GbtUO7ofpukJE4Opi16aTfrnurJ2lUizB0iE/edit?usp=sharing)
+
+Visiona le [Slides di presentazione Progetto](https://docs.google.com/a/jcmaxwell.it/presentation/d/1y14rz0iCm6O_igFDaniIv5s_kccipSwN_iw5h48k9bE/edit?usp=sharing)
 
 ### Prerequisiti
 Java SDK (Software Development Kit) - programma per la compilazione (javac) da codice in Java a ByteCode. L'installazione comprende anche Java JRE (Java Runtime Envirorment) che fornisce la Virtual Machine (VM) su cui far eseguire il ByteCode.
