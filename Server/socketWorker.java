@@ -89,7 +89,7 @@ class SocketWorker implements Runnable {
                     }
                 }
             }
-            out.println("Comandi disponibili: !Users, !CreateGP, !InviteUser, !JoinGP, !ExitGP, !Help");
+            out.println("Comandi disponibili: !Users, !CreateGP, !InviteUser, !JoinGP, !ExitGP, !ListGP,!Help");
             }
             
             
