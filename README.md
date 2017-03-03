@@ -72,7 +72,7 @@ cd Documents\NetBeansProjects\Java-Sockets-Client\src
 java ClientTesto localhost 1234
 ```
 
-### Per vedere i comandi accessibili scrivere ```!Help``` durante la connessione
+### Per vedere i comandi accessibili scrivere ```!Help``` durante la connessione o visita la [wiki](https://github.com/Casetta/Java-Sockets/wiki/Commands#comandi-programma)
 
 ## Licenza
 Open Source nel modo piu' completo del termine :) senza alcuna restrizione! Editabile e riadattabile
