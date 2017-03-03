@@ -8,14 +8,19 @@ import java.io.*;
 import java.util.ArrayList;
 import static java.util.Collections.list;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Gasperini Luca, Casetta Lorenzo
  */
 class SocketWorker implements Runnable {
-  private Socket client;
-
+  public Socket client;
+    BufferedReader in = null;
+        PrintWriter out = null;
+  private String lastMSG=null;
+  private int posGP;
     //Constructor: inizializza le variabili
     SocketWorker(Socket client) {
         this.client = client;
@@ -25,11 +30,9 @@ class SocketWorker implements Runnable {
     // Questa e' la funzione che viene lanciata quando il nuovo "Thread" viene generato
     public void run(){
         
-        BufferedReader in = null;
-        PrintWriter out = null;
+        
         boolean firstTime =true;
-        Thread t=null;
-        int posGP=0;
+        posGP=-1;
         
         try{
           // connessione con il socket per ricevere (in) e mandare(out) il testo
@@ -86,76 +89,108 @@ class SocketWorker implements Runnable {
                     }
                 }
             }
-            out.println("Comandi disponibili: !Users, !CreateGP, !InviteUser, !JoinGP");
-            BroadcastListener w= new BroadcastListener(out, -1);
-            t = new Thread(w);
-            t.start();
+            out.println("Comandi disponibili: !Users, !CreateGP, !InviteUser, !JoinGP, !ExitGP, !ListGP,!Help");
             }
             
+            
             for(int i=0;i<ServerTestoMultiThreaded.Gruppi.size();i++){
-                if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)&&!ServerTestoMultiThreaded.Gruppi.get(i).getTitle().equals(ServerTestoMultiThreaded.Gruppi.get(posGP).getTitle())){
-                    out.println("Sei stato invitato al gruppo "+ServerTestoMultiThreaded.Gruppi.get(i).getTitle()+", scrivi !joinGP e il nome del gruppo per entrare");
+                if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)){
+                    if(posGP<0){
+                        out.println("Sei stato invitato al gruppo "+ServerTestoMultiThreaded.Gruppi.get(i).getTitle()+", scrivi !joinGP e il nome del gruppo per entrare");
+                    }else if(posGP!=i)
+                        out.println("Sei stato invitato al gruppo "+ServerTestoMultiThreaded.Gruppi.get(i).getTitle()+", scrivi !joinGP e il nome del gruppo per entrare");
                 }
             }
+		  if(posGP<0){
+			  out.print(">");
+		  }
+		  else{
+			  out.print(ServerTestoMultiThreaded.Gruppi.get(posGP).getTitle()+">")
+		  }
+		  
             
             
             line = in.readLine();
-
-		if(line.equals("!Users")){
+            
+            if(line!=null){
+		if(line.equals("!Users")){                                                     //mostra lista utenti online
+			System.out.println(nameClient+" ha richiesto il comando !Users");
                     _lenghtList = ServerTestoMultiThreaded.Utenti.size();
 			for(int j=0;j<_lenghtList;j++){
 				if(ServerTestoMultiThreaded.Utenti.get(j).getStatus()) out.println(ServerTestoMultiThreaded.Utenti.get(j).getNickname());
 			}
-		}else if(line.equals("!CreateGP")){
-                    t.interrupt();
-                    out.println("Inserisci il titolo della group chat");
+		}else if(line.equals("!CreateGP")){                                           //crea group chat
+			System.out.println(nameClient+" ha richiesto il comando !CreateGP");
+                    out.println("Nome del gruppo ");
                     String _title = in.readLine();
-                    out.println("Inserisci la descrizione della group chat");
+                    out.println("Descrizione del gruppo ");
                     ServerTestoMultiThreaded.Gruppi.add(new Group(_title, in.readLine(), ServerTestoMultiThreaded.Utenti.get(posClient)));
                     posGP=ServerTestoMultiThreaded.Gruppi.size()-1;
-                    BroadcastListener w= new BroadcastListener(out, posGP);
-                    t = new Thread(w);
-                    t.start();
-                }else if(line.equals("!InviteUser")){
-                    out.println("Inserisci nome utente da invitare");
+                }else if(line.equals("!InviteUser")){                                       //invita utente
+                    if(posGP<0){
+                        out.println("Non sei all'interno di un group chat");
+                    }else{
+                    out.println("Utente da invitare : ");
                     _lenghtList = ServerTestoMultiThreaded.Utenti.size();
 			for(int j=0;j<_lenghtList;j++){
 				if(ServerTestoMultiThreaded.Utenti.get(j).getStatus()&&ServerTestoMultiThreaded.Utenti.get(j).getNickname().equals(in.readLine())){
-                                    out.println("Utente: "+ServerTestoMultiThreaded.Utenti.get(j).getNickname()+" invitato");
+                                    out.println(ServerTestoMultiThreaded.Utenti.get(j).getNickname() + " invitato");
                                     ServerTestoMultiThreaded.Gruppi.get(posGP).setNewUser(ServerTestoMultiThreaded.Utenti.get(j));
                                 }
                         }
-                }else if(line.equals("!JoinGP")){
+                    }
+                }else if(line.equals("!JoinGP")){                           //entra in una group chat
+			System.out.println(nameClient+" ha richiesto il comando !JoinGP");
                     out.println("Scrivi il nome del gruppo");
                     for(int i=0;i<ServerTestoMultiThreaded.Gruppi.size();i++){
-                        if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)&&ServerTestoMultiThreaded.Gruppi.get(i).getTitle().equals(in.readLine())){
+                        if(ServerTestoMultiThreaded.Gruppi.get(i).userExists(nameClient)&& ServerTestoMultiThreaded.Gruppi.get(i).getTitle().equals(in.readLine())){
                             posGP=i;
-                            t.interrupt();
-                            BroadcastListener w= new BroadcastListener(out, posGP);
-                            t = new Thread(w);
-                            t.start();
-                            out.println("Connesso alla chat gruppo");
+                            out.println("benvenuto");
                         }
                     }
-                }else{
+                }else if(line.equals("!ExitGP")){                                   //esci dalla chat di gruppo
+			System.out.println(nameClient+" ha richiesto il comando !ExitGP");
+                    if(posGP<0){
+                        out.println("Non sei all'interno di una group chat");
+                    }else{
+                        ServerTestoMultiThreaded.Gruppi.get(posGP).removeUser(ServerTestoMultiThreaded.Utenti.get(posClient));
+                        posGP=-1;
+                        out.println("Hai abbandonato la chat");
+                    
+                    }
+                    
+                }else if(line.equals("!ListGP")){
+			System.out.println(nameClient+" ha richiesto il comando !ListGP");
+			for(int i=0;i<ServerTestoMultiThreaded.Gruppi.size();i++){
+                        	out.println("Nome: "+ServerTestoMultiThreaded.Gruppi.get(posGP).getTitle());
+				out.println("Descrizione: "+ServerTestoMultiThreaded.Gruppi.get(posGP).getDescription());
+                    }
+		}
+		    else if(line.equals("!Help")){
+			    System.out.println(nameClient+" ha richiesto il comando !Help");
+			out.println("!Users -> comando per visualizzare gli utenti attualmente online sul server");
+			out.println("!CreateGP -> comando per creare una stanza di chat privata");
+			out.println("!InviteUser -> comando per invitare un utente online sul server in una stanza di chat privata");
+			out.println("!JoinGP -> dopo aver ricevuto un invito, si può usare questo comando per accedere alla stanza di chat privata");
+			out.println("!ExitGP -> comando per uscire dalla stanza di chat privata");
+			out.println("!ListGP -> elenca tutte le stanze di chat private esistenti sul server");
+		}
+                else{
                      //Manda lo stesso messaggio appena ricevuto con in aggiunta il "nome" del client
-                    out.println("Server---> " + nameClient + ">> " + line);
+                    out.print("      -Inviato");
+			out.println("");
                     //scrivi messaggio ricevuto su terminale
-                    System.out.println(nameClient + ": " + line);
+                    System.out.println("-Ricevuto messaggio da "nameClient + " : " + line);
                 }
-                
-                
-           
-            
-            if(posGP==0){
-                 ServerTestoMultiThreaded.Broadcast=nameClient + ": " + line;
-            }else{
-                ServerTestoMultiThreaded.Gruppi.get(posGP-1).setBroadcastMessage(nameClient + ": " + line);
             }
+                
+                
+           lastMSG= nameClient + ": " + line;
+            ServerTestoMultiThreaded.Update(nameClient + ": " + line, posGP);
             
            
            } catch (IOException e) {
-            System.out.println("lettura da socket fallito");
+           
             System.exit(-1);
            }
         }
@@ -169,4 +204,9 @@ class SocketWorker implements Runnable {
 	ServerTestoMultiThreaded.Utenti.get(posClient).setStatus(false);
     }
     
+    public void sendMessage(String text, int GP){
+        if(!text.equals(lastMSG) && GP==posGP){
+            out.println(text);
+        }
+    }    
 }

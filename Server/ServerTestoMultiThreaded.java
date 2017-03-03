@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ServerTestoMultiThreaded {
+public class ServerTestoMultiThreaded {             
     
     public static List<User> Utenti = new ArrayList();
     public static String Broadcast = "";
     public static List<Group> Gruppi = new ArrayList();
-    
+    public static List<SocketWorker> threads = new ArrayList();
 
     public static void main(String[] args) {
 
@@ -29,6 +29,7 @@ public class ServerTestoMultiThreaded {
             System.out.println("Uso: java ServerTestoMultithreaded <Porta Server>");
             return;
         }
+        
 
         int portNumber = Integer.parseInt(args[0]);
 
@@ -42,7 +43,8 @@ public class ServerTestoMultiThreaded {
                 try {
                     //server.accept returns a client connection
                     w = new SocketWorker(server.accept());
-                    Thread t = new Thread(w);                    
+                    Thread t = new Thread(w);
+                    threads.add(w);
                     t.start();
                 } catch (IOException e) {
                     System.out.println("Connessione NON riuscita con client: ");
@@ -56,6 +58,12 @@ public class ServerTestoMultiThreaded {
 
         
     }
+    
+    public static void Update(String text, int GP){                         //broadcast del messaggio a tutti gli utenti del server
+        for (int j=0;j<threads.size();j++) {
+            threads.get(j).sendMessage(text, GP);
+        }
+}
     
 
     
